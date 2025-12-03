@@ -1,25 +1,57 @@
-import { Book, Author } from '../types';
+import { Book } from "../types";
 
 export const fetchBookDetailsByOLID = async (olid: string): Promise<Book | null> => {
-    try {
-        const response = await fetch(`https://openlibrary.org/works/${olid}.json`);
-        const data = await response.json();
-        
-        // Map the response data to our Book interface
-        const book: Book = {
-            id: data.key,
-            title: data.title,
-            authors: data.authors?.map((author: Author) => ({
-                key: author.key,
-                name: author.name
-            })) || [],
-            published_year: data.first_publish_year,
-            description: data.description
-        };
-        
-        return book;
-    } catch (error) {
-        console.error('Error fetching book details:', error);
-        return null;
-    }
+  try {
+      const cleanOlid = olid.trim();
+
+      // format check
+      if (!isValidOLID(cleanOlid)) {
+          console.error('invalid OLID format');
+          return null;
+      }
+
+      const apiKey = `OLID:${cleanOlid}`;
+      const url = `https://openlibrary.org/api/books?bibkeys=${apiKey}&format=json&jscmd=data`;
+
+      const response = await fetch(url);
+      if (!response.ok) {
+          console.error('API error:', response.status);
+          return null;
+      }
+
+      const data = await response.json();
+      const bookData = data[apiKey];
+      if (!bookData) {
+          console.log('NO BOOK FOUND:', cleanOlid);
+          return null;
+      }
+
+      return {
+          id: cleanOlid,
+          title: bookData.title || 'Unknown Title',
+          authors: bookData.authors?.map((author: any) => ({
+              key: author.url?.split('/').pop() || 'unknown',
+              name: author.name || 'Unknown Author'
+          })) || [],
+          published_year: extractYear(bookData.publish_date),
+          description: bookData.excerpts?.[0]?.text || bookData.description?.value || '',
+          cover_url: bookData.cover?.medium || ''
+      };
+
+  } catch (error) {
+      console.error('failed to fetch book:', error);
+      return null;
+  }
 };
+
+// is ID valid?
+function isValidOLID(olid: string): boolean {
+  return olid.startsWith('OL') && olid.endsWith('M');
+}
+
+// if its possible to extract a year from the string, it does it
+function extractYear(dateString?: string): number | undefined {
+  if (!dateString) return undefined;
+  const match = dateString.match(/\d{4}/);
+  return match ? parseInt(match[0]) : undefined;
+}

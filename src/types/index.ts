@@ -1,15 +1,13 @@
-//  what an Author looks like.
 export interface Author {
-  key: string;  
+  key: string;  // contains unique ID from OL
   name: string; 
 }
-
-// what a Book looks like in application.
 
 export interface Book {
   id: string;                
   title: string;             
-  authors: Author[];         
+  authors: Author[];         // [] means if a book have several authours
   published_year?: number;   
-  description?: string;     
+  description: string;       
+  cover_url?: string;        
 }
