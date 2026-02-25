@@ -1,6 +1,6 @@
 My Book App 📚
 
-Hi! This is an app for keeping track of books as a coding challenge for XTIVIA.
+Hi! This is an app for keeping track of books.
 
 What I used here:
 
