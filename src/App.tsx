@@ -18,7 +18,7 @@ function App() {
       </div>
       <footer className="bg-amber-800 text-amber-200 py-6 mt-12">
         <div className="max-w-3xl mx-auto px-5 text-center">
-          <p className="text-sm">Made by Alisa S. for Xtivia using React, Tailwind CSS, and Flowbite 😻</p>
+          <p className="text-sm">Made by Alisa S. using React, Tailwind CSS, and Flowbite 😻</p>
         </div>
       </footer>
     </div>
